@@ -148,8 +148,15 @@ tojs(x) = x
 
 Print Javascript code to `io` that constructs the equivalent of `x`.
 """
-showjs(io, x::Any) = JSON.show_json(io, JSEvalSerialization(), x)
-showjs(io, x::AbstractString) = write(io, JSON.json(x))
+function showjs end
+@static if isdefined(JSON, :Object)
+    showjs(io, x::Any) = JSON.show_json(io, JSEvalSerialization(), x)
+    showjs(io, x::AbstractString) = write(io, JSON.json(x))
+else
+    function showjs(io, x::Any; pretty = !isa(x, AbstractString), kwargs...)
+        JSON.json(io, x; pretty, kwargs...)
+    end
+end
 
 """
     @js_str(s)
@@ -179,13 +186,14 @@ macro js_str(s)
    :(JSString(sprint(io->(begin; $(writes...) end))))
 end
 
-const JSONContext = JSON.Writer.StructuralContext
-const JSONSerialization = JSON.Serializations.CommonSerialization
+@static if !isdefined(JSON, :Object)
+    const JSONContext = JSON.Writer.StructuralContext
+    const JSONSerialization = JSON.Serializations.CommonSerialization
 
-struct JSEvalSerialization <: JSONSerialization end
-
-
-# adapted (very slightly) from JSON.jl test/serializer.jl
-function JSON.show_json(io::JSONContext, ::JSEvalSerialization, x::JSString)
-    Base.print(io, x.s)
+    struct JSEvalSerialization <: JSONSerialization end
+    
+    # adapted (very slightly) from JSON.jl test/serializer.jl
+    function JSON.show_json(io::JSONContext, ::JSEvalSerialization, x::JSString)
+       Base.print(io, x.s)
+    end
 end

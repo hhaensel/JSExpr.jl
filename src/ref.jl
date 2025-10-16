@@ -1,7 +1,7 @@
 function crawl(::Val{:ref}, args...)
     return :(dereference($(crawl.(args)...)))
 end
-function deparse(::Val{:index}, b::JSNode, idx)::JSString
+function deparse(::Val{:index}, b::JSNode, idx = JSExpr.JSTerminal(js""))::JSString
     return jsstring(deparse(b), "[", deparse(idx), "]")
 end
 

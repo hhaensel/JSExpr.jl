@@ -64,7 +64,7 @@ function deparse(::Val{H}, args...) where {H}
     # deparse; for example, if crawl is implemented but deparse was forgotten,
     # or crawl generates a JSAST with more arguments than the deparse method
     # supports.
-    error("JSAST expression type ($(QuoteNode(H))) cannot be deparsed.")
+    error("JSAST expression type ($(QuoteNode(H))) cannot be deparsed with arguments: $(args).")
 end
 
 """
