@@ -152,8 +152,13 @@ end
 function crawl(h::Val{:(.)}, lhs, rhs)
     # We unquote the RHS because of the way that Julia adds QuoteNode's to dot
     # expression.
-    return :(JSAST(:(.), $(crawl(lhs)), $(crawl(_unquote(rhs)))))
+    return :(JSAST(:(.), $(crawl(_unquote(lhs))), $(crawl(_unquote(rhs)))))
 end
 function deparse(h::Val{:(.)}, lhs, rhs)
-    return js"$(deparse(lhs)).$(deparse(rhs))"
+    lhs_js = deparse(lhs)
+    rhs_js = deparse(rhs)
+    if startswith(rhs_js.s, '"') && endswith(rhs_js.s, '"')
+        return jsstring(lhs_js, "[", rhs_js, "]")
+    end
+    return jsstring(lhs_js, ".", rhs_js)
 end

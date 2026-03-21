@@ -149,7 +149,7 @@ tojs(x) = x
 Print Javascript code to `io` that constructs the equivalent of `x`.
 """
 function showjs end
-@static if isdefined(JSON, :Object)
+@static if !isdefined(JSON, :Object)
     showjs(io, x::Any) = JSON.show_json(io, JSEvalSerialization(), x)
     showjs(io, x::AbstractString) = write(io, JSON.json(x))
 else
