@@ -141,7 +141,8 @@ end
 
 Returns a JSString object that constructs the same object as `x`
 """
-tojs(x) = x
+tojs(x) = JSString(json(x))
+tojs(x::AbstractString) = JSString(x)
 
 """
     showjs(io, x)
